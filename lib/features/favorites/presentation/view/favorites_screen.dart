@@ -63,15 +63,21 @@ class _FavoritesView extends StatelessWidget {
                 return ProductGrid(
                   children: favorites.map((product) {
                     return ProductCard(
+                      // صورة المنتج من الـ API
+                      image: product.imagePath,
+
                       title: product.name,
                       description: product.description,
                       price: '${product.price}',
                       rating: product.rating,
+
                       isFavorite: favouriteCubit.isFavorite(product),
                       showFavorite: true,
+
                       onFavoriteTap: () {
                         favouriteCubit.toggleFavourite(product);
                       },
+
                       onTap: () {
                         Navigator.push(
                           context,

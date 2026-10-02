@@ -7,7 +7,7 @@ import 'package:stylish/core/widgets/app_svg.dart';
 class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
-    this.image = AppImages.shirt,
+    this.image,
     this.title = 'Mens Starry',
     this.description = 'Mens Starry Sky Printed Shirt 100% Cotton Fabric',
     this.price = '₹399',
@@ -18,8 +18,7 @@ class ProductCard extends StatelessWidget {
     this.onTap,
     this.onFavoriteTap,
   });
-
-  final String image;
+  final String? image;
   final String title;
   final String description;
   final String price;
@@ -29,7 +28,6 @@ class ProductCard extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback? onTap;
   final VoidCallback? onFavoriteTap;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -45,13 +43,26 @@ class ProductCard extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(6),
+                ),
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
                     Container(
                       color: AppColors.imageBg,
-                      child: Image.asset(image, fit: BoxFit.contain),
+                      child: image != null && image!.isNotEmpty
+                          ? Image.network(
+                              image!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (_, _, _) {
+                                return Image.asset(
+                                  AppImages.shirt,
+                                  fit: BoxFit.contain,
+                                );
+                              },
+                            )
+                          : Image.asset(AppImages.shirt, fit: BoxFit.contain),
                     ),
                     if (showFavorite)
                       Positioned(
@@ -74,19 +85,29 @@ class ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w400, color: AppColors.black),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.black,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     price,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -95,7 +116,11 @@ class ProductCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         reviews,
-                        style: const TextStyle(fontSize: 10,fontWeight: FontWeight.w400, color: AppColors.lightGrey),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.lightGrey,
+                        ),
                       ),
                     ],
                   ),
@@ -110,12 +135,15 @@ class ProductCard extends StatelessWidget {
 }
 
 class FavoriteButton extends StatelessWidget {
-  const FavoriteButton({super.key, required this.isFavorite, this.onTap, this.size = 26});
-
+  const FavoriteButton({
+    super.key,
+    required this.isFavorite,
+    this.onTap,
+    this.size = 26,
+  });
   final bool isFavorite;
   final VoidCallback? onTap;
   final double size;
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -141,10 +169,8 @@ class FavoriteButton extends StatelessWidget {
 
 class StarRating extends StatelessWidget {
   const StarRating({super.key, required this.rating, this.size = 12});
-
   final double rating;
   final double size;
-
   @override
   Widget build(BuildContext context) {
     return Row(

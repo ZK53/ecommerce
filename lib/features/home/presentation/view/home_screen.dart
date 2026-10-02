@@ -54,7 +54,12 @@ class _HomeView extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SearchScreen()),
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: favouriteCubit,
+                    child: const SearchScreen(),
+                  ),
+                ),
               );
             },
           ),
@@ -133,13 +138,15 @@ class _HomeView extends StatelessWidget {
                       shrinkWrap: true,
                       children: productState.products.map((product) {
                         return ProductCard(
+                          // صورة المنتج القادمة من الـ API
+                          image: product.imagePath,
+
                           title: product.name,
                           description: product.description,
                           price: '${product.price}',
                           rating: product.rating,
 
                           isFavorite: favouriteCubit.isFavorite(product),
-
                           showFavorite: true,
 
                           onFavoriteTap: () {

@@ -16,13 +16,13 @@ class FavouriteCubit extends Cubit<FavouriteState> {
 
   Future<void> toggleFavourite(ProductModel product) async {
     final oldValue = isFavorite(product);
+    final newValue = !oldValue;
 
     emit(FavouriteLoading(product.id));
 
     try {
+      // نفس الـ endpoint بيعمل toggle في الـ API
       await _repo.addToFavourite(productId: product.id);
-
-      final newValue = !oldValue;
 
       _favorites[product.id] = newValue;
 

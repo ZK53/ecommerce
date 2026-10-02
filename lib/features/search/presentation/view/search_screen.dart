@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:stylish/core/widgets/app_search_bar.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/product_grid.dart';
-
 import 'package:stylish/features/favorites/presentation/cubit/favorites_cubit.dart';
-
 import 'package:stylish/features/product/presentation/cubit/product_cubit.dart';
 import 'package:stylish/features/product/presentation/cubit/product_state.dart';
 import 'package:stylish/features/product/presentation/view/product_details_screen.dart';
@@ -41,7 +38,9 @@ class _SearchScreenState extends State<SearchScreen> {
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               child: AppSearchBar(
                 controller: _controller,
-                onChanged: (_) => setState(() {}),
+                onChanged: (_) {
+                  setState(() {});
+                },
               ),
             ),
 
@@ -61,11 +60,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   if (state is ProductSuccess) {
                     final query = _controller.text.trim().toLowerCase();
 
-                    final results = query.isEmpty
-                        ? state.products
-                        : state.products.where((product) {
-                            return product.name.toLowerCase().contains(query);
-                          }).toList();
+                    // Don't show products until the user types something
+                    if (query.isEmpty) {
+                      return const SizedBox();
+                    }
+
+                    final results = state.products.where((product) {
+                      return product.name.toLowerCase().contains(query);
+                    }).toList();
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,43 +84,53 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
 
                         Expanded(
-                          child: ProductGrid(
-                            children: results.map((product) {
-                              return ProductCard(
-                                title: product.name,
-                                description: product.description,
-                                price: '${product.price}',
-                                rating: product.rating,
+                          child: results.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No products found',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                )
+                              : ProductGrid(
+                                  children: results.map((product) {
+                                    return ProductCard(
+                                      title: product.name,
+                                      description: product.description,
+                                      price: '${product.price}',
+                                      rating: product.rating,
 
-                                isFavorite: context
-                                    .watch<FavouriteCubit>()
-                                    .isFavorite(product),
+                                      isFavorite: context
+                                          .watch<FavouriteCubit>()
+                                          .isFavorite(product),
 
-                                showFavorite: true,
+                                      showFavorite: true,
 
-                                onFavoriteTap: () {
-                                  context
-                                      .read<FavouriteCubit>()
-                                      .toggleFavourite(product);
-                                },
+                                      onFavoriteTap: () {
+                                        context
+                                            .read<FavouriteCubit>()
+                                            .toggleFavourite(product);
+                                      },
 
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) {
-                                        return ProductDetailsScreen(
-                                          product: product,
-                                          favouriteCubit: context
-                                              .read<FavouriteCubit>(),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) {
+                                              return ProductDetailsScreen(
+                                                product: product,
+                                                favouriteCubit: context
+                                                    .read<FavouriteCubit>(),
+                                              );
+                                            },
+                                          ),
                                         );
                                       },
-                                    ),
-                                  );
-                                },
-                              );
-                            }).toList(),
-                          ),
+                                    );
+                                  }).toList(),
+                                ),
                         ),
                       ],
                     );
