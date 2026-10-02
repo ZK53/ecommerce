@@ -4,6 +4,7 @@ import 'package:stylish/core/cache/cache_keys.dart';
 import 'package:stylish/core/widgets/stylish_logo.dart';
 import 'package:stylish/features/main/view/main_screen.dart';
 import 'package:stylish/features/onboarding/presentation/view/get_started_screen.dart';
+import 'package:stylish/features/onboarding/presentation/view/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -38,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } else {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => const GetStartedScreen()),
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
         (route) => false,
       );
     }
