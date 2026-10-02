@@ -33,10 +33,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   showFavorite: true,
                   isFavorite: true,
                   onFavoriteTap: () => setState(() => _count--),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProductDetailsScreen()),
-                  ),
+                  onTap: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (_) => const ProductDetailsScreen(),
+                    //   ),
+                    // );
+                  },
                 ),
               ),
             ),

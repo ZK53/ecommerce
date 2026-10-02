@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish/core/widgets/app_search_bar.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/product_grid.dart';
+import 'package:stylish/features/product/presentation/cubit/product_cubit.dart';
+import 'package:stylish/features/product/presentation/cubit/product_state.dart';
 import 'package:stylish/features/product/presentation/view/product_details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -13,14 +16,12 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  static const _products = ['Mens Starry', 'Mens Starry'];
-
   final _controller = TextEditingController();
 
-  List<String> get _results {
-    final query = _controller.text.trim().toLowerCase();
-    if (query.isEmpty) return _products;
-    return _products.where((p) => p.toLowerCase().contains(query)).toList();
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProductCubit>().getProducts();
   }
 
   @override
@@ -31,8 +32,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final results = _results;
-
     return Scaffold(
       appBar: const DetailAppBar(title: 'Search'),
       body: Column(
@@ -45,26 +44,68 @@ class _SearchScreenState extends State<SearchScreen> {
               onChanged: (_) => setState(() {}),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-            child: Text(
-              '${results.length} Items',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-            ),
-          ),
+
+          const SizedBox(height: 16),
+
           Expanded(
-            child: ProductGrid(
-              children: results
-                  .map(
-                    (name) => ProductCard(
-                      title: name,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ProductDetailsScreen()),
+            child: BlocBuilder<ProductCubit, ProductState>(
+              builder: (context, state) {
+                if (state is ProductLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is ProductFailure) {
+                  return Center(child: Text(state.message));
+                }
+
+                if (state is ProductSuccess) {
+                  final query = _controller.text.trim().toLowerCase();
+
+                  final results = query.isEmpty
+                      ? state.products
+                      : state.products.where((product) {
+                          return product.name.toLowerCase().contains(query);
+                        }).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                        child: Text(
+                          '${results.length} Items',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                  )
-                  .toList(),
+                      Expanded(
+                        child: ProductGrid(
+                          children: results.map((product) {
+                            return ProductCard(
+                              title: product.name,
+                              description: product.description,
+                              price: '${product.price}',
+                              rating: product.rating,
+                              isFavorite: product.isFavorite,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      ProductDetailsScreen(product: product),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                return const SizedBox();
+              },
             ),
           ),
         ],

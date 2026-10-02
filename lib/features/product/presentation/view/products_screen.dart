@@ -6,6 +6,8 @@ import 'package:stylish/core/widgets/product_grid.dart';
 import 'package:stylish/core/widgets/stylish_logo.dart';
 import 'package:stylish/features/category/presentation/cubit/category_cubit.dart';
 import 'package:stylish/features/category/presentation/cubit/category_state.dart';
+import 'package:stylish/features/product/presentation/cubit/product_cubit.dart';
+import 'package:stylish/features/product/presentation/cubit/product_state.dart';
 import 'package:stylish/features/product/presentation/view/product_details_screen.dart';
 
 class ProductsScreen extends StatefulWidget {
@@ -16,66 +18,107 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  static const _count = 6;
-
-  final int _category = 0;
-  final List<bool> _favorites = List.filled(_count, false);
+  int? _categoryId;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
-        children: [
-          const Center(child: StylishLogo(height: 31, width: 111)),
-          const SizedBox(height: 20),
-          const Text(
-            'All Featured',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          BlocBuilder<CategoryCubit, CategoryState>(
-            builder: (context, state) {
-              if (state is CategoryLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (state is CategoryFailure) {
-                return Center(child: Text(state.message));
-              }
-
-              if (state is CategorySuccess) {
-                return CategoryRow(categories: state.categories);
-              }
-
-              return const SizedBox();
-            },
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Products',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 12),
-          ProductGrid(
-            shrinkWrap: true,
-            children: List.generate(
-              _count,
-              (i) => ProductCard(
-                showFavorite: true,
-                isFavorite: _favorites[i],
-                onFavoriteTap: () =>
-                    setState(() => _favorites[i] = !_favorites[i]),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ProductDetailsScreen(),
-                  ),
-                ),
-              ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ProductCubit()..getProducts()),
+        BlocProvider(create: (_) => CategoryCubit()..getCategories()),
+      ],
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+          children: [
+            const Center(child: StylishLogo(height: 31, width: 111)),
+            const SizedBox(height: 20),
+            const Text(
+              'All Featured',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            BlocBuilder<CategoryCubit, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is CategoryFailure) {
+                  return Center(child: Text(state.message));
+                }
+
+                if (state is CategorySuccess) {
+                  return CategoryRow(
+                    categories: state.categories,
+                    selectedIndex: state.categories.indexWhere(
+                      (category) => category.id == _categoryId,
+                    ),
+                    onChanged: (index) {
+                      setState(() {
+                        _categoryId = state.categories[index].id;
+                      });
+                    },
+                  );
+                }
+
+                return const SizedBox();
+              },
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Products',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+
+            BlocBuilder<ProductCubit, ProductState>(
+              builder: (context, state) {
+                if (state is ProductLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (state is ProductFailure) {
+                  return Center(child: Text(state.message));
+                }
+
+                if (state is ProductSuccess) {
+                  final products = _categoryId == null
+                      ? state.products
+                      : state.products
+                            .where(
+                              (product) => product.categoryId == _categoryId,
+                            )
+                            .toList();
+                  return ProductGrid(
+                    shrinkWrap: true,
+                    children: List.generate(
+                      products.length,
+                      (i) => ProductCard(
+                        title: products[i].name,
+                        description: products[i].description,
+                        price: '${products[i].price}',
+                        rating: products[i].rating,
+                        isFavorite: products[i].isFavorite,
+                        showFavorite: true,
+                        onFavoriteTap: () {},
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                ProductDetailsScreen(product: products[i]),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

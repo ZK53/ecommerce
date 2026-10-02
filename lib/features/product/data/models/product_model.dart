@@ -7,6 +7,7 @@ class ProductModel {
   final double rating;
   final bool isFavorite;
   final int bestSeller;
+  final int categoryId;
 
   ProductModel({
     required this.id,
@@ -17,6 +18,7 @@ class ProductModel {
     required this.rating,
     required this.isFavorite,
     required this.bestSeller,
+    required this.categoryId,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class ProductModel {
       rating: (json['rating'] as num).toDouble(),
       isFavorite: json['is_favorite'],
       bestSeller: json['best_seller'],
+      categoryId: json['category']['id'],
     );
   }
 }

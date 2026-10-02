@@ -6,9 +6,12 @@ import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/quantity_stepper.dart';
+import 'package:stylish/features/product/data/models/product_model.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key});
+  const ProductDetailsScreen({super.key, required this.product});
+
+  final ProductModel product;
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -34,7 +37,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   Container(
                     color: AppColors.imageBg,
-                    child: Image.asset(AppImages.shirt, fit: BoxFit.contain),
+                    child: Image.network(
+                      widget.product.imagePath,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                   Positioned(
                     top: 10,
@@ -49,36 +55,49 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
           ),
+
           const SizedBox(height: 20),
-          const Text(
-            'Mens Starry',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+
+          Text(
+            widget.product.name,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
+
           const SizedBox(height: 8),
-          const Text(
-            'Vision Alta Men’s Shoes Size (All Colours) Mens Starry Sky '
-            'Printed Shirt 100% Cotton Fabric',
-            style: TextStyle(fontSize: 14,fontWeight: FontWeight.w400, height: 1.5, color: AppColors.grey),
+
+          Text(
+            widget.product.description,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+              color: AppColors.grey,
+            ),
           ),
+
           const SizedBox(height: 20),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '100 \$',
-                style: TextStyle(
+              Text(
+                '${widget.product.price} \$',
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primary,
                 ),
               ),
+
               QuantityStepper(
                 quantity: _quantity,
                 onChanged: (v) => setState(() => _quantity = v),
               ),
             ],
           ),
+
           const SizedBox(height: 28),
+
           CustomButton(
             text: 'Add To Cart',
             icon: const AppSvg(AppIcons.cart, size: 18, color: Colors.white),

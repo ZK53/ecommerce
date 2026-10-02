@@ -119,7 +119,8 @@ class _HomeView extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const ProductDetailsScreen(),
+                          builder: (_) =>
+                              ProductDetailsScreen(product: product),
                         ),
                       ),
                     );
