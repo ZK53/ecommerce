@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/theme/app_theme.dart';
-import 'package:stylish/features/onboarding/view/splash_screen.dart';
+import 'package:stylish/features/onboarding/presentation/view/splash_screen.dart';
 
 void main() {
   runApp(const StylishApp());

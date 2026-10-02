@@ -7,7 +7,7 @@ import 'package:stylish/core/widgets/app_svg.dart';
 import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/order_item_card.dart';
-import 'package:stylish/features/orders/view/my_orders_screen.dart';
+import 'package:stylish/features/orders/presentation/view/my_orders_screen.dart';
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});

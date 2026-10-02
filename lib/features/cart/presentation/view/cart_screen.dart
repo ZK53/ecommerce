@@ -6,7 +6,7 @@ import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/order_item_card.dart';
 import 'package:stylish/core/widgets/summary_row.dart';
-import 'package:stylish/features/cart/view/checkout_screen.dart';
+import 'package:stylish/features/cart/presentation/view/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});

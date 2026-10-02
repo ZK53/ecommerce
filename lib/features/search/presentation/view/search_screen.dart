@@ -3,7 +3,7 @@ import 'package:stylish/core/widgets/app_search_bar.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/product_grid.dart';
-import 'package:stylish/features/product/view/product_details_screen.dart';
+import 'package:stylish/features/product/presentation/view/product_details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

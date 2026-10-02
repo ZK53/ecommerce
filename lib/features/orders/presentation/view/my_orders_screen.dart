@@ -4,8 +4,8 @@ import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/widgets/app_svg.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/status_tabs.dart';
-import 'package:stylish/features/orders/view/order_details_screen.dart';
-import 'package:stylish/features/orders/view/widgets/order_card.dart';
+import 'package:stylish/features/orders/presentation/view/order_details_screen.dart';
+import 'package:stylish/features/orders/presentation/view/widgets/order_card.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});

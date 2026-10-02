@@ -6,7 +6,7 @@ import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/order_item_card.dart';
 import 'package:stylish/core/widgets/small_pill_button.dart';
 import 'package:stylish/core/widgets/summary_row.dart';
-import 'package:stylish/features/orders/view/widgets/order_card.dart';
+import 'package:stylish/features/orders/presentation/view/widgets/order_card.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   const OrderDetailsScreen({super.key, required this.status});

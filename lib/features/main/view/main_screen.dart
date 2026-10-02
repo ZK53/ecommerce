@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/widgets/app_bottom_nav.dart';
 import 'package:stylish/core/widgets/cart_fab.dart';
-import 'package:stylish/features/cart/view/cart_screen.dart';
-import 'package:stylish/features/home/view/home_screen.dart';
-import 'package:stylish/features/product/view/products_screen.dart';
-import 'package:stylish/features/profile/view/profile_screen.dart';
+import 'package:stylish/features/cart/presentation/view/cart_screen.dart';
+import 'package:stylish/features/home/presentation/view/home_screen.dart';
+import 'package:stylish/features/product/presentation/view/products_screen.dart';
+import 'package:stylish/features/profile/presentation/view/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/theme/app_theme.dart';
-import 'package:stylish/features/favorites/view/favorites_screen.dart';
-import 'package:stylish/features/onboarding/view/get_started_screen.dart';
-import 'package:stylish/features/orders/view/my_orders_screen.dart';
+import 'package:stylish/features/favorites/presentation/view/favorites_screen.dart';
+import 'package:stylish/features/onboarding/presentation/view/get_started_screen.dart';
+import 'package:stylish/features/orders/presentation/view/my_orders_screen.dart';
 
 /// محتوى تاب Profile — مش موجود في التصميم، ده مجرد نقطة دخول
 /// لشاشات My Orders و My Favorites.

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/widgets/custom_button.dart';
-import 'package:stylish/features/auth/view/sign_in_screen.dart';
-import 'package:stylish/features/auth/view/sign_up_screen.dart';
+import 'package:stylish/features/auth/presentation/view/sign_in_screen.dart';
+import 'package:stylish/features/auth/presentation/view/sign_up_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {
   const GetStartedScreen({super.key});

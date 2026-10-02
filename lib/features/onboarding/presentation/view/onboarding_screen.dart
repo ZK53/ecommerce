@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/theme/app_colors.dart';
-import 'package:stylish/features/onboarding/view/get_started_screen.dart';
-import 'package:stylish/features/onboarding/view/widgets/onboarding_page.dart';
+import 'package:stylish/features/onboarding/presentation/view/get_started_screen.dart';
+import 'package:stylish/features/onboarding/presentation/view/widgets/onboarding_page.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
