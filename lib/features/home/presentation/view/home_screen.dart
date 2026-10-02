@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:stylish/core/widgets/app_search_bar.dart';
 import 'package:stylish/core/widgets/category_row.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/product_grid.dart';
 import 'package:stylish/core/widgets/stylish_logo.dart';
-
+import 'package:stylish/features/cart/presentation/cubit/cart_cubit.dart';
 import 'package:stylish/features/category/presentation/cubit/category_cubit.dart';
 import 'package:stylish/features/category/presentation/cubit/category_state.dart';
-
 import 'package:stylish/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:stylish/features/favorites/presentation/cubit/favorites_state.dart';
-
 import 'package:stylish/features/home/presentation/view/widgets/promo_banner.dart';
-
 import 'package:stylish/features/product/presentation/cubit/product_cubit.dart';
 import 'package:stylish/features/product/presentation/cubit/product_state.dart';
 import 'package:stylish/features/product/presentation/view/product_details_screen.dart';
-
 import 'package:stylish/features/search/presentation/view/search_screen.dart';
-
 import 'package:stylish/features/silder/presentation/cubit/slider_cubit.dart';
 import 'package:stylish/features/silder/presentation/cubit/slider_state.dart';
 
@@ -157,9 +151,12 @@ class _HomeView extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) {
-                                  return ProductDetailsScreen(
-                                    product: product,
-                                    favouriteCubit: favouriteCubit,
+                                  return BlocProvider.value(
+                                    value: context.read<CartCubit>(),
+                                    child: ProductDetailsScreen(
+                                      product: product,
+                                      favouriteCubit: favouriteCubit,
+                                    ),
                                   );
                                 },
                               ),

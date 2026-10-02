@@ -5,6 +5,7 @@ import 'package:stylish/core/widgets/category_row.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/product_grid.dart';
 import 'package:stylish/core/widgets/stylish_logo.dart';
+import 'package:stylish/features/cart/presentation/cubit/cart_cubit.dart';
 
 import 'package:stylish/features/category/presentation/cubit/category_cubit.dart';
 import 'package:stylish/features/category/presentation/cubit/category_state.dart';
@@ -132,10 +133,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) {
-                                    return ProductDetailsScreen(
-                                      product: product,
-                                      favouriteCubit: favouriteCubit,
+                                 builder: (_) {
+                                    return BlocProvider.value(
+                                      value: context.read<CartCubit>(),
+                                      child: ProductDetailsScreen(
+                                        product: product,
+                                        favouriteCubit: favouriteCubit,
+                                      ),
                                     );
                                   },
                                 ),

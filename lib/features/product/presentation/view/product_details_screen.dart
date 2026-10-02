@@ -8,6 +8,7 @@ import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/quantity_stepper.dart';
+import 'package:stylish/features/cart/presentation/cubit/cart_cubit.dart';
 
 import 'package:stylish/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:stylish/features/favorites/presentation/cubit/favorites_state.dart';
@@ -117,8 +118,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             text: 'Add To Cart',
             icon: const AppSvg(AppIcons.cart, size: 18, color: Colors.white),
             onPressed: () {
+              context.read<CartCubit>().addToCart(
+                product: widget.product,
+                quantity: _quantity,
+              );
+
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Added $_quantity item(s) to cart')),
+                SnackBar(content: Text('${widget.product.name} added to cart')),
               );
             },
           ),

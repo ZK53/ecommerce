@@ -1,96 +1,168 @@
 import 'package:flutter/material.dart';
-import 'package:stylish/core/constants/image_assets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/utils/formatters.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/order_item_card.dart';
 import 'package:stylish/core/widgets/small_pill_button.dart';
 import 'package:stylish/core/widgets/summary_row.dart';
-import 'package:stylish/features/orders/presentation/view/widgets/order_card.dart';
+
+import 'package:stylish/features/orders/data/models/order_model.dart';
+import 'package:stylish/features/orders/presentation/cubit/orders_cubit.dart';
+import 'package:stylish/features/orders/presentation/cubit/orders_state.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
-  const OrderDetailsScreen({super.key, required this.status});
+  const OrderDetailsScreen({super.key, required this.order});
 
-  final OrderStatus status;
+  final OrderModel order;
 
   String get _statusLabel {
-    switch (status) {
-      case OrderStatus.active:
+    switch (order.status) {
+      case 0:
         return 'Active';
-      case OrderStatus.completed:
+
+      case 1:
         return 'Completed';
-      case OrderStatus.cancelled:
+
+      case 2:
         return 'Cancelled';
+
+      default:
+        return 'Unknown';
     }
+  }
+
+  bool get _isActive {
+    return order.status == 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const DetailAppBar(title: 'Order Details'),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Order No. 005', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                  SizedBox(height: 2),
-                  Text('29 Nov, 01:20 pm', style: TextStyle(fontSize: 10, color: AppColors.grey)),
-                ],
-              ),
-              Text(_statusLabel, style: const TextStyle(fontSize: 14, color: AppColors.primary)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          OrderItemCard(
-            image: AppImages.womensCasualWear,
-            name: "Women's Casual Wear",
-            itemLabel: '1 item',
-            price: money(34),
-            oldPrice: money(64),
-            total: money(34),
-          ),
-          const SizedBox(height: 14),
-          OrderItemCard(
-            image: AppImages.mensJacket,
-            name: "Men's Jacket",
-            rating: '4.7',
-            itemLabel: '1 item',
-            price: money(45),
-            oldPrice: money(67),
-            total: money(45),
-          ),
-          const SizedBox(height: 16),
-          SummaryRow(label: 'Subtotal', value: money(79)),
-          SummaryRow(label: 'Tax and Fees', value: money(3)),
-          SummaryRow(label: 'Delivery Fee', value: money(2)),
-          const Divider(color: AppColors.divider),
-          SummaryRow(label: 'Order Total', value: money(84), bold: true),
-          if (status == OrderStatus.active) ...[
-            const SizedBox(height: 20),
+    return BlocListener<OrderCubit, OrderState>(
+      listener: (context, state) {
+        if (state is OrderActionSuccess && state.orderId == order.id) {
+          Navigator.pop(context, 'cancelled');
+        }
+
+        if (state is OrderFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
+      child: Scaffold(
+        appBar: const DetailAppBar(title: 'Order Details'),
+        body: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SmallPillButton(
-                  text: 'Cancel Order',
-                  onPressed: () => Navigator.pop(context, 'cancelled'),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Order No. ${order.id}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order.orderDate,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 12),
-                SmallPillButton(
-                  text: 'Track Driver',
-                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Driver is on the way')),
+                Text(
+                  _statusLabel,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.primary,
                   ),
                 ),
               ],
             ),
+
+            const SizedBox(height: 16),
+
+            ...order.items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: OrderItemCard(
+                  image: item.image,
+                  name: item.name,
+                  rating: item.rating.toString(),
+                  itemLabel: '${item.quantity} item',
+                  price: money(item.price),
+                  oldPrice: '',
+                  total: money(item.totalPrice),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 2),
+
+            SummaryRow(label: 'Subtotal', value: money(order.subtotal)),
+
+            SummaryRow(label: 'Tax and Fees', value: money(order.tax)),
+
+            SummaryRow(label: 'Delivery Fee', value: money(order.shipping)),
+
+            const Divider(color: AppColors.divider),
+
+            SummaryRow(
+              label: 'Order Total',
+              value: money(order.total),
+              bold: true,
+            ),
+
+            if (_isActive) ...[
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  BlocBuilder<OrderCubit, OrderState>(
+                    builder: (context, state) {
+                      final isLoading =
+                          state is OrderActionLoading &&
+                          state.orderId == order.id;
+
+                      return SmallPillButton(
+                        text: isLoading ? 'Cancelling...' : 'Cancel Order',
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                                context.read<OrderCubit>().cancelOrder(
+                                  order.id,
+                                );
+                              },
+                      );
+                    },
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  SmallPillButton(
+                    text: 'Track Driver',
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Driver is on the way')),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

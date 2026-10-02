@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/widgets/app_svg.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/status_tabs.dart';
+
+import 'package:stylish/features/orders/data/models/order_model.dart';
+import 'package:stylish/features/orders/presentation/cubit/orders_cubit.dart';
+import 'package:stylish/features/orders/presentation/cubit/orders_state.dart';
 import 'package:stylish/features/orders/presentation/view/order_details_screen.dart';
 import 'package:stylish/features/orders/presentation/view/widgets/order_card.dart';
 
@@ -16,56 +22,58 @@ class MyOrdersScreen extends StatefulWidget {
 
 class _MyOrdersScreenState extends State<MyOrdersScreen> {
   int _tab = 0;
-  bool _hasActive = true;
-  bool _hasCancelled = false;
 
-  void _cancelOrder() {
-    setState(() {
-      _hasActive = false;
-      _hasCancelled = true;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Order cancelled')),
-    );
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<OrderCubit>().getOrders();
   }
 
-  void _track() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Driver is on the way')),
-    );
-  }
-
-  Future<void> _openDetails(OrderStatus status) async {
+  Future<void> _openDetails(OrderModel order) async {
     final result = await Navigator.push<String>(
       context,
-      MaterialPageRoute(builder: (_) => OrderDetailsScreen(status: status)),
+      MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)),
     );
-    if (result == 'cancelled' && status == OrderStatus.active) _cancelOrder();
+
+    if (result == 'cancelled' && mounted) {
+      context.read<OrderCubit>().getOrders();
+    }
   }
 
-  Widget _body() {
+  Widget _ordersList(List<OrderModel> orders) {
+    if (orders.isEmpty) {
+      return const _EmptyOrders(
+        message: "You don't have any\norders at this time",
+      );
+    }
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: orders.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final order = orders[index];
+
+        return OrderCard(order: order, onTap: () => _openDetails(order));
+      },
+    );
+  }
+
+  Widget _body(OrderSuccess state) {
     switch (_tab) {
       case 0:
-        return _hasActive
-            ? OrderCard(
-                status: OrderStatus.active,
-                onTap: () => _openDetails(OrderStatus.active),
-                onCancel: _cancelOrder,
-                onTrack: _track,
-              )
-            : const _EmptyOrders(message: "You don't have any\nactive orders at this\ntime");
+        return _ordersList(state.active);
+
       case 1:
-        return OrderCard(
-          status: OrderStatus.completed,
-          onTap: () => _openDetails(OrderStatus.completed),
-        );
+        return _ordersList(state.completed);
+
+      case 2:
+        return _ordersList(state.canceled);
+
       default:
-        return _hasCancelled
-            ? OrderCard(
-                status: OrderStatus.cancelled,
-                onTap: () => _openDetails(OrderStatus.cancelled),
-              )
-            : const _EmptyOrders(message: "You don't have any\ncancelled orders at\nthis time");
+        return const SizedBox();
     }
   }
 
@@ -80,10 +88,44 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             StatusTabs(
               labels: const ['Active', 'Completed', 'Cancelled'],
               selectedIndex: _tab,
-              onChanged: (i) => setState(() => _tab = i),
+              onChanged: (i) {
+                setState(() {
+                  _tab = i;
+                });
+              },
             ),
+
             const SizedBox(height: 20),
-            Expanded(child: SingleChildScrollView(child: _body())),
+
+            Expanded(
+              child: BlocBuilder<OrderCubit, OrderState>(
+                builder: (context, state) {
+                  if (state is OrderLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state is OrderFailure) {
+                    return Center(
+                      child: Text(state.message, textAlign: TextAlign.center),
+                    );
+                  }
+
+                  if (state is OrderSuccess) {
+                    return RefreshIndicator(
+                      onRefresh: () {
+                        return context.read<OrderCubit>().getOrders();
+                      },
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: _body(state),
+                      ),
+                    );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -104,7 +146,9 @@ class _EmptyOrders extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const AppSvg(AppIcons.emptyOrders, size: 200),
+
           const SizedBox(height: 20),
+
           Text(
             message,
             textAlign: TextAlign.center,

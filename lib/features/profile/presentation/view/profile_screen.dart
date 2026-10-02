@@ -5,10 +5,8 @@ import 'package:stylish/core/theme/app_theme.dart';
 import 'package:stylish/features/favorites/presentation/cubit/favorites_cubit.dart';
 import 'package:stylish/features/favorites/presentation/view/favorites_screen.dart';
 import 'package:stylish/features/onboarding/presentation/view/get_started_screen.dart';
+import 'package:stylish/features/orders/presentation/cubit/orders_cubit.dart';
 import 'package:stylish/features/orders/presentation/view/my_orders_screen.dart';
-
-/// محتوى تاب Profile — مش موجود في التصميم، ده مجرد نقطة دخول
-/// لشاشات My Orders و My Favorites.
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -31,7 +29,12 @@ class ProfileScreen extends StatelessWidget {
             label: 'My Orders',
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const MyOrdersScreen()),
+              MaterialPageRoute(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<OrderCubit>(),
+                  child: const MyOrdersScreen(),
+                ),
+              ),
             ),
           ),
 
@@ -92,9 +95,7 @@ class _ProfileTile extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 20, color: AppColors.black),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Text(
                 label,
@@ -104,7 +105,6 @@ class _ProfileTile extends StatelessWidget {
                 ),
               ),
             ),
-
             const Icon(Icons.chevron_right, color: AppColors.grey),
           ],
         ),

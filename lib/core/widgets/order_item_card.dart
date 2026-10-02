@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/theme/app_colors.dart';
-import 'package:stylish/core/theme/app_theme.dart';
 import 'package:stylish/core/widgets/quantity_stepper.dart';
 
-/// كارت منتج جوه Cart / Checkout / Order Details.
-/// لو بعتّ quantity و onQuantityChanged بيظهر الـ stepper.
 class OrderItemCard extends StatelessWidget {
   const OrderItemCard({
     super.key,
@@ -35,11 +32,11 @@ class OrderItemCard extends StatelessWidget {
     final showStepper = quantity != null && onQuantityChanged != null;
 
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: AppShadows.card,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         children: [
@@ -47,53 +44,102 @@ class OrderItemCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.asset(image, width: 72, height: 84, fit: BoxFit.cover),
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  color: AppColors.imageBg,
+                  child: Image(
+                    image: image.startsWith('http')
+                        ? NetworkImage(image)
+                        : AssetImage(image),
+                    width: 72,
+                    height: 84,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 72,
+                        height: 84,
+                        color: AppColors.imageBg,
+                        child: const Icon(
+                          Icons.image_not_supported_outlined,
+                          color: AppColors.grey,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-              const SizedBox(width: 10),
+
+              const SizedBox(width: 12),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(height: 2),
+
+                    const SizedBox(height: 6),
+
                     Row(
                       children: [
-                        Text(rating, style: const TextStyle(fontSize: 10)),
-                        const SizedBox(width: 2),
-                        const Icon(Icons.star, size: 11, color: AppColors.star),
+                        Text(
+                          rating,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.star, size: 14, color: Colors.amber),
                       ],
                     ),
-                    if (itemLabel != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Text(
-                          itemLabel!,
-                          style: const TextStyle(fontSize: 10, color: AppColors.grey),
+
+                    if (itemLabel != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        itemLabel!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.grey,
                         ),
                       ),
-                    const SizedBox(height: 4),
+                    ],
+
+                    const SizedBox(height: 8),
+
                     Row(
                       children: [
                         Text(
                           price,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          oldPrice,
                           style: const TextStyle(
-                            fontSize: 9,
-                            color: AppColors.lightGrey,
-                            decoration: TextDecoration.lineThrough,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+
+                        if (oldPrice.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            oldPrice,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.grey,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                    if (showStepper)
+
+                    if (showStepper) ...[
+                      const SizedBox(height: 8),
                       Align(
                         alignment: Alignment.centerRight,
                         child: QuantityStepper(
@@ -101,24 +147,32 @@ class OrderItemCard extends StatelessWidget {
                           onChanged: onQuantityChanged!,
                         ),
                       ),
+                    ],
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          const Divider(height: 1, color: AppColors.divider),
-          const SizedBox(height: 6),
+
+          const SizedBox(height: 12),
+
+          const Divider(color: AppColors.divider, height: 1),
+
+          const SizedBox(height: 10),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Total Order (${quantity ?? 1}) :',
-                style: const TextStyle(fontSize: 10),
+                style: const TextStyle(fontSize: 13, color: AppColors.grey),
               ),
               Text(
                 total,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
