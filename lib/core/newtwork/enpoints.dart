@@ -8,4 +8,7 @@ abstract class Enpoints {
   static final String getUserData = "get_user_data";
   static final String updateProfile = "update_profile";
   static final String refreshToken = "refresh_token";
+  static final String products = "products";
+  static final String categories = "categories";
+  static final String sliders = "sliders";
 }

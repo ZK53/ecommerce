@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/theme/app_colors.dart';
+import 'package:stylish/features/silder/data/models/slider_model.dart';
 
 class PromoBanner extends StatefulWidget {
-  const PromoBanner({super.key, this.count = 3});
+  const PromoBanner({super.key, required this.sliders});
 
-  final int count;
+  final List<SliderModel> sliders;
 
   @override
   State<PromoBanner> createState() => _PromoBannerState();
@@ -21,16 +21,19 @@ class _PromoBannerState extends State<PromoBanner> {
         SizedBox(
           height: 150,
           child: PageView.builder(
-            itemCount: widget.count,
+            itemCount: widget.sliders.length,
             onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (context, _) => const _PromoSlide(),
+            itemBuilder: (context, i) {
+              return _PromoSlide(slider: widget.sliders[i]);
+            },
           ),
         ),
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(widget.count, (i) {
+          children: List.generate(widget.sliders.length, (i) {
             final active = i == _index;
+
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -49,7 +52,9 @@ class _PromoBannerState extends State<PromoBanner> {
 }
 
 class _PromoSlide extends StatelessWidget {
-  const _PromoSlide();
+  const _PromoSlide({required this.slider});
+
+  final SliderModel slider;
 
   @override
   Widget build(BuildContext context) {
@@ -62,16 +67,13 @@ class _PromoSlide extends StatelessWidget {
           colors: [Color(0xFFFF6E88), Color(0xFFFFA9B8)],
         ),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            right: 0,
-            bottom: 0,
-            top: 0,
-            child: Image.asset(AppImages.promoModel, fit: BoxFit.contain),
-          ),
-          
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          slider.imagePath,
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
       ),
     );
   }
