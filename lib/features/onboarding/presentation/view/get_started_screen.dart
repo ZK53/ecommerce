@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/widgets/custom_button.dart';
+import 'package:stylish/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:stylish/features/auth/presentation/view/sign_in_screen.dart';
 import 'package:stylish/features/auth/presentation/view/sign_up_screen.dart';
 
@@ -44,14 +46,23 @@ class GetStartedScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   const Text(
                     'Find it here, buy it now!',
-                    style: TextStyle(color: Colors.white, fontSize: 14,fontWeight: FontWeight.w400),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   CustomButton(
                     text: 'Login',
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const SignInScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => AuthCubit(),
+                          child: SignInScreen(),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -60,7 +71,12 @@ class GetStartedScreen extends StatelessWidget {
                     outlined: true,
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => AuthCubit(),
+                          child: const SignUpScreen(),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 24),

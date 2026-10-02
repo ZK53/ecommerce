@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish/core/constants/image_assets.dart';
 import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/utils/validators.dart';
 import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/custom_text_field.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
-import 'package:stylish/features/main/view/main_screen.dart';
+import 'package:stylish/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:stylish/features/auth/presentation/cubit/auth_state.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -32,7 +34,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _createAccount() {
@@ -50,75 +54,101 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _showError('Passwords do not match');
       return;
     }
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-      (route) => false,
+    context.read<AuthCubit>().register(
+      name: _name.text.trim(),
+      phone: _phone.text.trim(),
+      email: _email.text.trim(),
+      password: _password.text,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const DetailAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20,),
-            const Text(
-              'Create an\naccount',
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700, ),
-            ),
-            const SizedBox(height: 30),
-            CustomTextField(
-              hintText: 'Full Name',
-              controller: _name,
-              prefixIcon: AppIcons.person,
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: 'Phone',
-              controller: _phone,
-              prefixIcon: AppIcons.phone,
-              keyboardType: TextInputType.phone,
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: 'Email',
-              controller: _email,
-              prefixIcon: AppIcons.mail,
-              keyboardType: TextInputType.emailAddress,
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: 'Password',
-              controller: _password,
-              prefixIcon: AppIcons.lock,
-              obscureText: true,
-            ),
-            const SizedBox(height: 12),
-            CustomTextField(
-              hintText: 'Confirm Password',
-              controller: _confirm,
-              prefixIcon: AppIcons.lock,
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            const Text.rich(
-              TextSpan(
-                style: TextStyle(fontSize: 12, color: AppColors.grey, fontWeight: FontWeight.w400),
-                children: [
-                  TextSpan(text: 'By clicking the '),
-                  TextSpan(text: 'Register', style: TextStyle(color: AppColors.primary)),
-                  TextSpan(text: ' button, you agree\nto the public offer'),
-                ],
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is RegisterSuccess) {
+          _showError(state.message);
+
+          Navigator.pop(context);
+        }
+
+        if (state is AuthFailure) {
+          _showError(state.message);
+        }
+      },
+      child: Scaffold(
+        appBar: const DetailAppBar(),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 20),
+              const Text(
+                'Create an\naccount',
+                style: TextStyle(fontSize: 36, fontWeight: FontWeight.w700),
               ),
-            ),
-            const SizedBox(height: 28),
-            Center(child: CustomButton(text: 'Create Account', onPressed: _createAccount)),
-          ],
+              const SizedBox(height: 30),
+              CustomTextField(
+                hintText: 'Full Name',
+                controller: _name,
+                prefixIcon: AppIcons.person,
+              ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                hintText: 'Phone',
+                controller: _phone,
+                prefixIcon: AppIcons.phone,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                hintText: 'Email',
+                controller: _email,
+                prefixIcon: AppIcons.mail,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                hintText: 'Password',
+                controller: _password,
+                prefixIcon: AppIcons.lock,
+                obscureText: true,
+              ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                hintText: 'Confirm Password',
+                controller: _confirm,
+                prefixIcon: AppIcons.lock,
+                obscureText: true,
+              ),
+              const SizedBox(height: 16),
+              const Text.rich(
+                TextSpan(
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppColors.grey,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  children: [
+                    TextSpan(text: 'By clicking the '),
+                    TextSpan(
+                      text: 'Register',
+                      style: TextStyle(color: AppColors.primary),
+                    ),
+                    TextSpan(text: ' button, you agree\nto the public offer'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 28),
+              Center(
+                child: CustomButton(
+                  text: 'Create Account',
+                  onPressed: _createAccount,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

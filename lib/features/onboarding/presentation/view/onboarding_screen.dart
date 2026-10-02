@@ -60,7 +60,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPressed: _goToGetStarted,
                 child: const Text(
                   'Skip',
-                  style: TextStyle(fontSize: 18,color: AppColors.black, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -116,7 +120,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: _isLast ? _goToGetStarted : () => _move(_index + 1),
+                        onPressed: _isLast
+                            ? _goToGetStarted
+                            : () => _move(_index + 1),
                         child: Text(
                           _isLast ? 'Get Started' : 'Next',
                           style: const TextStyle(
