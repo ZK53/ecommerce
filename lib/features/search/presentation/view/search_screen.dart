@@ -19,12 +19,6 @@ class _SearchScreenState extends State<SearchScreen> {
   final _controller = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    context.read<ProductCubit>().getProducts();
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -32,83 +26,87 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const DetailAppBar(title: 'Search'),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: AppSearchBar(
-              controller: _controller,
-              onChanged: (_) => setState(() {}),
+    return BlocProvider(
+      create: (_) => ProductCubit()..getProducts(),
+      child: Scaffold(
+        appBar: const DetailAppBar(title: 'Search'),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: AppSearchBar(
+                controller: _controller,
+                onChanged: (_) => setState(() {}),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          Expanded(
-            child: BlocBuilder<ProductCubit, ProductState>(
-              builder: (context, state) {
-                if (state is ProductLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            Expanded(
+              child: BlocBuilder<ProductCubit, ProductState>(
+                builder: (context, state) {
+                  if (state is ProductLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (state is ProductFailure) {
-                  return Center(child: Text(state.message));
-                }
+                  if (state is ProductFailure) {
+                    return Center(child: Text(state.message));
+                  }
 
-                if (state is ProductSuccess) {
-                  final query = _controller.text.trim().toLowerCase();
+                  if (state is ProductSuccess) {
+                    final query = _controller.text.trim().toLowerCase();
 
-                  final results = query.isEmpty
-                      ? state.products
-                      : state.products.where((product) {
-                          return product.name.toLowerCase().contains(query);
-                        }).toList();
+                    final results = query.isEmpty
+                        ? state.products
+                        : state.products.where((product) {
+                            return product.name.toLowerCase().contains(query);
+                          }).toList();
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        child: Text(
-                          '${results.length} Items',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: Text(
+                            '${results.length} Items',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(
-                        child: ProductGrid(
-                          children: results.map((product) {
-                            return ProductCard(
-                              title: product.name,
-                              description: product.description,
-                              price: '${product.price}',
-                              rating: product.rating,
-                              isFavorite: product.isFavorite,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      ProductDetailsScreen(product: product),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  );
-                }
 
-                return const SizedBox();
-              },
+                        Expanded(
+                          child: ProductGrid(
+                            children: results.map((product) {
+                              return ProductCard(
+                                title: product.name,
+                                description: product.description,
+                                price: '${product.price}',
+                                rating: product.rating,
+                                isFavorite: product.isFavorite,
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        ProductDetailsScreen(product: product),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
