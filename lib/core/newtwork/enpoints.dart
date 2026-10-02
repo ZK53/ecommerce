@@ -12,4 +12,5 @@ abstract class Enpoints {
   static final String categories = "categories";
   static final String sliders = "sliders";
   static final String search = "products/search";
+  static final String addToFavourites = "add_to_favorite";
 }

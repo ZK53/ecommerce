@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stylish/core/constants/image_assets.dart';
+
 import 'package:stylish/core/theme/app_colors.dart';
 import 'package:stylish/core/widgets/app_svg.dart';
 import 'package:stylish/core/widgets/custom_button.dart';
 import 'package:stylish/core/widgets/detail_app_bar.dart';
 import 'package:stylish/core/widgets/product_card.dart';
 import 'package:stylish/core/widgets/quantity_stepper.dart';
+
+import 'package:stylish/features/favorites/presentation/cubit/favorites_cubit.dart';
+import 'package:stylish/features/favorites/presentation/cubit/favorites_state.dart';
 import 'package:stylish/features/product/data/models/product_model.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
-  const ProductDetailsScreen({super.key, required this.product});
+  const ProductDetailsScreen({
+    super.key,
+    required this.product,
+    required this.favouriteCubit,
+  });
 
   final ProductModel product;
+  final FavouriteCubit favouriteCubit;
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -19,7 +29,6 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _quantity = 1;
-  bool _favorite = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,26 +54,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Positioned(
                     top: 10,
                     right: 10,
-                    child: FavoriteButton(
-                      isFavorite: _favorite,
-                      size: 30,
-                      onTap: () => setState(() => _favorite = !_favorite),
+                    child: BlocBuilder<FavouriteCubit, FavouriteState>(
+                      bloc: widget.favouriteCubit,
+                      builder: (context, state) {
+                        return FavoriteButton(
+                          isFavorite: widget.favouriteCubit.isFavorite(
+                            widget.product,
+                          ),
+                          size: 30,
+                          onTap: () {
+                            widget.favouriteCubit.toggleFavourite(
+                              widget.product,
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
             ),
           ),
-
           const SizedBox(height: 20),
-
           Text(
             widget.product.name,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
-
           const SizedBox(height: 8),
-
           Text(
             widget.product.description,
             style: const TextStyle(
@@ -74,9 +90,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               color: AppColors.grey,
             ),
           ),
-
           const SizedBox(height: 20),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -88,22 +102,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   color: AppColors.primary,
                 ),
               ),
-
               QuantityStepper(
                 quantity: _quantity,
-                onChanged: (v) => setState(() => _quantity = v),
+                onChanged: (v) {
+                  setState(() {
+                    _quantity = v;
+                  });
+                },
               ),
             ],
           ),
-
           const SizedBox(height: 28),
-
           CustomButton(
             text: 'Add To Cart',
             icon: const AppSvg(AppIcons.cart, size: 18, color: Colors.white),
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Added $_quantity item(s) to cart')),
-            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Added $_quantity item(s) to cart')),
+              );
+            },
           ),
         ],
       ),

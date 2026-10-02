@@ -3,9 +3,11 @@ import 'package:stylish/core/cache/cache_helper.dart';
 import 'package:stylish/core/theme/app_theme.dart';
 import 'package:stylish/features/onboarding/presentation/view/splash_screen.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await CacheHelper.init();
+
   runApp(const StylishApp());
 }
 
